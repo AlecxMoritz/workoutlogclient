@@ -3,6 +3,7 @@ import WorkoutCreate from './WorkoutCreate';
 import WorkoutEdit from './WorkoutEdit';
 import { Container, Row, Col } from 'reactstrap';
 import WorkoutsTable from './WorkoutsTable';
+import { AuthContext } from '../auth/AuthContext';
 
 class WorkoutIndex extends React.Component {
     constructor(props){
@@ -33,7 +34,7 @@ class WorkoutIndex extends React.Component {
             method: "GET",
             headers: new Headers({
                 'Content-Type' : 'application/json',
-                'Authorization' : localStorage.getItem('token')
+                'Authorization' : this.props.auth.sessionToken //using from context
             })
         }).then((res) => res.json())
         .then((logData) => {
@@ -50,7 +51,7 @@ class WorkoutIndex extends React.Component {
             body: JSON.stringify({ log: { id: event.target.id } }),
             headers: new Headers({
                 'Content-Type' : 'application/json',
-                'Authorization' : localStorage.getItem('token')
+                'Authorization' : this.props.auth.sessionToken
             })
         })
         .then((res) => {
@@ -65,13 +66,18 @@ class WorkoutIndex extends React.Component {
             body: JSON.stringify({ log: workout }),
             headers: new Headers({
                 'Content-Type' : 'application/json',
-                'Authorization' : this.props.token
+                'Authorization' : this.props.auth.sessionToken
             })
         })
         .then((res) => {
             this.setState({ updatePressed: false })
             this.fetchWorkouts();
-        })
+        },
+        function(err) {
+            console.log(err)
+        }
+    )
+        
     }
 
    setUpdatedWorkout(event, workout) {
@@ -118,4 +124,8 @@ class WorkoutIndex extends React.Component {
 }      
 
 
-export default WorkoutIndex;
+export default props => (
+    <AuthContext.Consumer>
+        {auth => <WorkoutIndex {...props} auth={auth} />}
+    </AuthContext.Consumer>
+)

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Form, FormGroup, Label, Input, Button } from 'reactstrap';
 import styled from 'styled-components'
+import { AuthContext } from './AuthContext';
 
 const FancyLogin = styled.h1`
     margin-left: 1em;
@@ -18,7 +19,7 @@ const FancyButton = styled.button`
     background-color: #1b5dc6
 `
 
-export default class Login extends Component {
+class Login extends Component {
     
     constructor(props) {
         super(props)
@@ -84,3 +85,8 @@ export default class Login extends Component {
     }
 }
 
+export default props => (
+    <AuthContext.Consumer>
+        {auth => <Login {...props} auth={auth} />}
+    </AuthContext.Consumer>
+)

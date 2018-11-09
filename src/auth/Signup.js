@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Form, FormGroup, Label, Input, Button } from 'reactstrap';
+import { AuthContext } from '../auth/AuthContext'
 import styled from 'styled-components'
 
 const FancySignup = styled.h1`
@@ -11,7 +12,7 @@ const FancySignup = styled.h1`
 const FancyText = styled.h6`
     padding: 1em;
 `
-const FancyLabel =styled.label`
+const FancyLabel = styled.label`
     margin-left: 1em;
 `
 
@@ -29,37 +30,37 @@ class Signup extends Component {
             isEmpty: true,
         };
 
-            this.handleChange = this.handleChange.bind(this);
-            this.handleSubmit = this.handleSubmit.bind(this);
-            this.validateSignUp = this.validateSignup.bind(this);
-            
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.validateSignUp = this.validateSignup.bind(this);
+
     }
 
     handleChange(event) {
         this.setState({
             [event.target.name]: event.target.value,
         });
-        
+
     }
 
 
-      // left off here // not working?? ////
+    // left off here // not working?? ////
     handleSubmit(event) {
         fetch("http://localhost:4000/user/signup", {
             method: 'POST',
-            body: JSON.stringify({user:this.state}),
+            body: JSON.stringify({ user: this.state }),
             headers: new Headers({
-                'Content-Type' : 'application/json'
+                'Content-Type': 'application/json'
             })
         }).then(
             (response) => response.json()
-            
-            
+
+
         ).then((data) => {
-            this.props.setToken(data.sessionToken)
+            this.props.auth.setToken(data.sessionToken)
             console.log(data)
         })
-    
+
         event.preventDefault();
     }
 
@@ -69,7 +70,7 @@ class Signup extends Component {
         // })
         event.preventDefault();
         document.getElementById('usernameAlert').style.display = 'block';
-    
+
     }
 
     validatePassword(event) {
@@ -78,10 +79,10 @@ class Signup extends Component {
     }
 
 
-    
+
 
     render() {
-       
+
         const submitHandler = !this.state.username ? this.validateSignup : this.handleSubmit
         return (
             <div>
@@ -90,12 +91,12 @@ class Signup extends Component {
                 <Form onSubmit={submitHandler}>
                     <FormGroup>
                         <FancyLabel for="username">Username</FancyLabel>
-                        <Input id="username" type="text" name="username" placeholder="please enter your username" onChange={this.handleChange}  />
-                        <div id="usernameAlert" style={{display: 'none'}}>Username field must not be blank</div>
+                        <Input id="username" type="text" name="username" placeholder="please enter your username" onChange={this.handleChange} />
+                        <div id="usernameAlert" style={{ display: 'none' }}>Username field must not be blank</div>
                     </FormGroup>
                     <FormGroup>
                         <FancyLabel for="password">Password</FancyLabel>
-                        <Input id="su_password" type="password" name="password" placeholder="please enter your password" onChange={this.handleChange} /><div id="passwordAlert" style={{display: 'none'}}>Password needs one uppercase letter.</div>
+                        <Input id="su_password" type="password" name="password" placeholder="please enter your password" onChange={this.handleChange} /><div id="passwordAlert" style={{ display: 'none' }}>Password needs one uppercase letter.</div>
                     </FormGroup>
                     <Button color="primary" type="submit"> Sign Up </Button>
                 </Form>
@@ -104,4 +105,8 @@ class Signup extends Component {
     }
 }
 
-export default Signup;
+export default props => (
+    <AuthContext.Consumer>
+        {auth => <Signup {...props} auth={auth} />}
+    </AuthContext.Consumer>
+)

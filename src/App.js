@@ -2,18 +2,22 @@ import React, { Component } from 'react';
 import './App.css';
 import SiteBar from './home/Navbar';
 import Auth from './auth/Auth';
-import Splash from './home/Splash'
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Switch } from 'react-router-dom';
 import WorkoutIndex from './workouts/WorkoutIndex'
-
+import { AuthContext } from './auth/AuthContext';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
+    this.setToken = (token) => {
+      localStorage.setItem('token', token);
+      this.setState({ sessionToken: token });
+    }
+
     this.state = {
       sessionToken: '',
-      profileImage: ''
+      setToken: this.setToken,
     }
     this.setSessionState = this.setSessionState.bind(this);
     this.logout = this.logout.bind(this);
@@ -32,14 +36,14 @@ class App extends Component {
       return (
         <Switch>
           <Route path='/' exact>
-          <Splash sessionToken={this.state.sessionToken} profileImg={this.state.profileImage} />
+          <WorkoutIndex />
               </Route>
             </Switch>
       )
     } else {
       return (
         <Route>
-            <Auth setToken={this.setSessionState} addImage={this.modifyProfileImage}/> 
+            <Auth /> 
         </Route>
       )
     }
@@ -76,31 +80,14 @@ class App extends Component {
 
   render() {
     return (
-      <Router>  
-      
-      <div>
-      
-        <SiteBar clickLogout={this.logout}/>  
-        {this.protectedViews()}
-
-
-      {/* <Switch>
-        <Route path='/auth'>
-        <Auth setToken={this.setSessionState} addImage={this.modifyProfileImage}/>  
-        </Route>
-      </Switch> */}
-
-
-      {/*
-
-        <Route path='/' exact>
-       <Splash sessionToken={this.state.sessionToken} profileImg={this.state.profileImage} />
-          </Route>
-
-      */}
-
-      </div>
-    </Router> 
+      <Router>
+        <AuthContext.Provider value={this.state}>
+          <div>
+            <SiteBar clickLogout={this.logout}/>  
+            {this.protectedViews()}
+          </div>
+        </AuthContext.Provider>
+      </Router> 
     );
   }
 }
